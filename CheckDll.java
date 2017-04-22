@@ -53,8 +53,6 @@ public class CheckDll {
     }
 
 
-
-
     public void scan(){
         for(int iI = 0; iI < lklFiles.size(); iI++){
             Analyzer analyzer = new Analyzer();
@@ -67,7 +65,7 @@ public class CheckDll {
     public void analyze(){
         //methods
         init();
-        fileName(1); //2 files
+        fileName(2); //2 files
         scan();
     }
 

@@ -2,7 +2,15 @@
 import java.io.*;
 import java.util.*;
 
+
+
 public class Analyzer {
+
+
+    private String soname = "-1";
+    private String realName = "-1";
+    private String linkerName = "-1";
+
 
     /**
      * Checks if given file name it's actually a file
@@ -39,9 +47,10 @@ public class Analyzer {
         FileReader fr = null;
         int iN = 0;
 
-        String soname = "-1";
-        String realName = "-1";
-        String linkerName = "-1";
+        String handeler="...";
+        boolean chido = true;
+        boolean handeleropen = false;
+        boolean handelerclose = false;
 
         LinkedList<String> lklOfC = new LinkedList<String>();
 
@@ -97,6 +106,7 @@ public class Analyzer {
                             soname = getSoName(strippedString);
                             realName = getRealName(strippedString);
                             linkerName = getLinkerName(strippedString);
+                            System.out.println(linkerName + "LOLA");
 
 
                             System.out.println("2. Merge files and build the library.");
@@ -244,14 +254,78 @@ public class Analyzer {
                 }
 
                 if(FILENAME.contains(".c")){
+                    if(strippedString.contains("void")){ // Buscar por el putnador void para ser el handeler de la librerias dinamicas
+                        String result="";
+                        boolean checkifFunction = false; // verificar que si tiene  () lo mas probable es que es una llamada de funcion en vez de un handeler tmb asumire que solo es 1
+                        for(int iA=0;iA<strippedString.length();iA++){
+                            if(strippedString.charAt(iA)=='*'){
+                                    iA++;
+                                while(strippedString.charAt(iA)!=';' && strippedString.charAt(iA)!='(' && strippedString.charAt(iA)!=')'){
+                                    result+=strippedString.charAt(iA);
+                                    iA++;
+                                }
+                            }
+                            if(strippedString.charAt(iA)=='('||strippedString.charAt(iA)==')'){
+                                checkifFunction=true;
+                            }
+                        }
+                        if(!checkifFunction){
+                            handeler = result;
+                        }
+                    }else if(strippedString.contains(handeler) && strippedString.contains("dlopen")){ //handler va a ser utilizado para algo
+                        String strippedString2 = "";
 
+                        for(int iA=0;iA < strippedString.length();iA++){
+                            if(strippedString.charAt(iA) != ' '){
+                                strippedString2+=strippedString.charAt(iA);
+                            }
+                        }
+
+                        if(strippedString2.contains(handeler + "=dlopen(\"/opt/lib/") && strippedString2.contains("\",RTLD_LAZY")){//el handeler va a abrir algo
+                            handeleropen=true;
+                            if(!strippedString2.contains(linkerName)){
+
+                                    System.out.println(strippedString2);
+                                    System.out.println(linkerName);
+                                System.out.println("The linker name wasnt generated or is misspelled");
+
+                                chido=false;
+                            }
+                        }else{
+                            System.out.println("Wrong syntax in the opening of dynamic librery");
+                            chido=false;
+
+                            if(!strippedString2.contains(linkerName)){
+                                System.out.println("The linker name wasnt generated or is misspelled");
+                            }
+                        }
+                    }else if(strippedString.contains(handeler) && strippedString.contains("dlclose")){
+                            String strippedString2 = "";
+                            for(int iA=0;iA<strippedString.length();iA++){
+                                if(strippedString.charAt(iA) !=' '){
+                                    strippedString2+=strippedString.charAt(iA);
+                                }
+                            }
+                            if(strippedString2.contains("dlclose("+handeler+");")){
+                                handelerclose = true;
+                            }
+                    }
                 }
             }
+
 
             br.close();
 
         } catch (IOException e) {
 
+        }
+        if(handelerclose^handeleropen){
+            System.out.println("You forgot to either open or close the dynamic librery");
+            chido = false;
+        }
+        if(chido){
+
+            System.out.println("All good homes");
         }
 
     }
