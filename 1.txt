@@ -1,0 +1,6 @@
+gcc -fPIC -c fileDone.c fileDtwo.c
+gcc -shared -Wl, -soname=libDyn.so.1 -o libDyn.so.1.0.1 fileDone.o fileDtwo.o
+cp libDyn.so.1.0.1 /usr/lib
+ln -sf /usr/lib/libDyn.so.1.0.1 /usr/lib/libDyn.so
+ln -sf /usr/lib/libDyn.so.1.0.1 /usr/lib/libDyn.so.1
+gcc -Wall -L/path/to/lib prog.c -lDyn
