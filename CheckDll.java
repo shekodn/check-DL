@@ -54,9 +54,10 @@ public class CheckDll {
 
 
     public void scan(){
+        String hola="";
         for(int iI = 0; iI < lklFiles.size(); iI++){
             Analyzer analyzer = new Analyzer();
-            analyzer.readByLine(lklFiles.get(iI).getName());
+            hola = analyzer.readByLine(lklFiles.get(iI).getName(),hola);
         }
     }
 

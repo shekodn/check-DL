@@ -7,9 +7,6 @@ import java.util.*;
 public class Analyzer {
 
 
-    private String soname = "-1";
-    private String realName = "-1";
-    private String linkerName = "-1";
 
 
     /**
@@ -40,12 +37,16 @@ public class Analyzer {
      * @return a file with updated infomration
      */
      //&i
-    public void readByLine(String fileName){
+    public String readByLine(String fileName,String hola){
 
         String FILENAME = fileName;
         BufferedReader br = null;
         FileReader fr = null;
         int iN = 0;
+
+        String soname = "-1";
+        String realName = "-1";
+        String linkerName = hola;
 
         String handeler="...";
         boolean chido = true;
@@ -309,6 +310,15 @@ public class Analyzer {
                             if(strippedString2.contains("dlclose("+handeler+");")){
                                 handelerclose = true;
                             }
+                    }else if(strippedString.contains("return(0);")){
+                        if(handelerclose^handeleropen){
+                            System.out.println("You forgot to either open or close the dynamic librery");
+                            chido = false;
+                        }
+                        if(chido){
+                            System.out.println("All good homes");
+                        }
+
                     }
                 }
             }
@@ -319,15 +329,7 @@ public class Analyzer {
         } catch (IOException e) {
 
         }
-        if(handelerclose^handeleropen){
-            System.out.println("You forgot to either open or close the dynamic librery");
-            chido = false;
-        }
-        if(chido){
-
-            System.out.println("All good homes");
-        }
-
+        return linkerName;
     }
 
     public void getcFiles(String linea, LinkedList<String> list){
