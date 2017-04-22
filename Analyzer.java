@@ -89,13 +89,8 @@ public class Analyzer {
                             etapaExitosa = true;
 
                             soname = getSoName(strippedString);
-                            System.out.println("soname " + soname);
-
-                            // realName = getRealName(strippedString);
-                            // System.out.println("realName " + realName);
-
+                            realName = getRealName(strippedString);
                             linkerName = getLinkerName(strippedString);
-                            System.out.println("linkerName " + linkerName);
 
 
                             System.out.println("2. Merge files and build the library.");
@@ -219,12 +214,12 @@ public class Analyzer {
                                 etapaExitosa = false;
                             }
 
-                            if(!strippedString.contains("–L/path/to/lib")){
+                            if(!strippedString.contains("-L/path/to/lib")){
                                 System.out.println("Missing –L/path/to/lib");
                                 etapaExitosa = false;
                             }
 
-                            if(!strippedString.contains("–lDyn")){
+                            if(!strippedString.contains("-lDyn")){
                                 System.out.println("Missing –lDyn");
                                 etapaExitosa = false;
                             }
@@ -252,80 +247,36 @@ public class Analyzer {
 
     public String getLinkerName(String line){
 
-        //String line = "gcc –shared –Wl,-soname=libDyn.so.1 -o libDyn.so.1.0.1 *.o";
-        //System.out.println(line);
-
         int indexFrom = line.indexOf("=") + 1;
         String subLine = line.substring(indexFrom);
-        //System.out.println(subLine);
 
-        //Uno
-        indexFrom = subLine.indexOf("-");
-        String uno = subLine.substring(0, indexFrom);
-        uno = uno.trim();
-        //System.out.println(" Uno: " + uno);
+        String[] result = subLine.split("\\s");
 
-        //Dos
-        indexFrom = subLine.indexOf("-");
-        int indexTo = subLine.indexOf("*");
-        String auxDos = subLine.substring(indexFrom, indexTo);
-        indexFrom = subLine.indexOf("-") + 2;
-        String dos = subLine.substring(indexFrom, indexTo);
-        dos = dos.trim();
-        //System.out.println(" dos: " + dos);
+        String uno;
+        uno = result[0].substring(0, result[0].lastIndexOf('.'));
 
-        //Tres
-        indexFrom = subLine.indexOf(".");
-        String tres = subLine.substring(0, indexFrom + 3);
-        tres = tres.trim();
-        //System.out.println("tres: " + tres);
-
-        return tres;
-    }
-
-    public String getSoName(String line){
-
-        //String line = "gcc –shared –Wl,-soname=libDyn.so.1 -o libDyn.so.1.0.1 *.o";
-        //System.out.println(line);
-
-        int indexFrom = line.indexOf("=") + 1;
-        String subLine = line.substring(indexFrom);
-        //System.out.println(subLine);
-
-        //Uno
-        indexFrom = subLine.indexOf("-");
-        String uno = subLine.substring(0, indexFrom);
-        uno = uno.trim();
-        //System.out.println(" Uno: " + uno);
 
         return uno;
     }
 
-    public String getRealName(String line){
-
-        //String line = "gcc –shared –Wl,-soname=libDyn.so.1 -o libDyn.so.1.0.1 *.o";
-        //System.out.println(line);
+    public String getSoName(String line){
 
         int indexFrom = line.indexOf("=") + 1;
         String subLine = line.substring(indexFrom);
-        //System.out.println(subLine);
 
-        //Uno
-        indexFrom = subLine.indexOf("-");
-        String uno = subLine.substring(0, indexFrom);
-        uno = uno.trim();
-        //System.out.println(" Uno: " + uno);
+        String[] result = subLine.split("\\s");
 
-        //Dos
-        indexFrom = subLine.indexOf("-");
-        int indexTo = subLine.indexOf("*");
-        String auxDos = subLine.substring(indexFrom, indexTo);
-        indexFrom = subLine.indexOf("-") + 2;
-        String dos = subLine.substring(indexFrom, indexTo);
-        dos = dos.trim();
-        //System.out.println(" dos: " + dos);
+        return result[0];
+    }
 
-        return dos;
+    public String getRealName(String line){
+
+        int indexFrom = line.indexOf("=") + 1;
+        String subLine = line.substring(indexFrom);
+
+        String[] result = subLine.split("\\s");
+
+        return result[2];
     }
 
 

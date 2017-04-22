@@ -72,21 +72,9 @@ public class CheckDll {
     }
 
     public static void main(String[] args) {
-        //CheckDll checker = new CheckDll();
-        //checker.analyze();
+        CheckDll checker = new CheckDll();
+        checker.analyze();
 
-        String line = "gcc -shared -Wl, -soname=libDyn.so.1 -o libDyn.so.1.0.1 fileDone.o fileDtwo.o";
-        int indexFrom = line.indexOf("=") + 1;
-        String subLine = line.substring(indexFrom);
-
-        String[] result = subLine.split("\\s");
-
-        for (int x=0; x<result.length; x++) {
-            System.out.println(result[x]);
-        }
-
-        String uno;
-        uno = result[0].substring(0, result[0].lastIndexOf('.'));
 
     }
 }
