@@ -43,6 +43,8 @@ public class Analyzer {
         String realName = "-1";
         String linkerName = "-1";
 
+        LinkedList<String> lklOfC = new LinkedList<String>();
+
         try {
 
             fr = new FileReader(FILENAME);
@@ -68,6 +70,8 @@ public class Analyzer {
 
                             etapaExitosa = true;
 
+                            getcFiles(strippedString, lklOfC);
+
                             System.out.println("1. Compilation of the source code phase");
                             if(!strippedString.contains("-fPIC")){
                                 System.out.println("Missing -fPIC");
@@ -82,12 +86,14 @@ public class Analyzer {
                             if(etapaExitosa){
                                 System.out.println("No mistakes were found.");
                             }
+
+                            System.out.println("\n");
+
                         }
 
                         if(iN == 2){
 
                             etapaExitosa = true;
-
                             soname = getSoName(strippedString);
                             realName = getRealName(strippedString);
                             linkerName = getLinkerName(strippedString);
@@ -114,15 +120,30 @@ public class Analyzer {
                                 etapaExitosa = false;
                             }
 
-                            if(!soname.contains("lib") && !soname.contains(".so") ){
+                            if(!soname.contains("lib") || !soname.contains(".so") || !hasVersion(soname, 2)){
                                 System.out.println("soname: " + soname + " is incorrect!");
                                 System.out.println("Remember that the syntax is: prefix lib + nombre + .so + .version");
                                 etapaExitosa = false;
                             }
 
+                            if(!hasVersion(realName, 3)){
+                                System.out.println("realName: " + realName + " is incorrect!");
+                                System.out.println("Remember that the syntax is: soname + .minor_num [ + .release ]");
+                                etapaExitosa = false;
+                            }
+
+                            if(!compareOtoC(strippedString, lklOfC)){
+                                System.out.println("Remember that your .C files must match with your object files");
+                                etapaExitosa = false;
+                            }
+
+
                             if(etapaExitosa){
                                 System.out.println("No mistakes were found.");
                             }
+
+                            System.out.println("\n");
+
                         }
 
                         if(iN == 3){
@@ -130,7 +151,7 @@ public class Analyzer {
                             etapaExitosa = true;
 
                             System.out.println("3. Install the library.");
-                            System.out.println("Part 3.1");
+
                             if(!strippedString.contains("cp")){
                                 System.out.println("Missing cp");
                                 etapaExitosa = false;
@@ -145,17 +166,10 @@ public class Analyzer {
                                 System.out.println("Missing " + realName);
                                 etapaExitosa = false;
                             }
-
-                            if(etapaExitosa){
-                                System.out.println("No mistakes were found.");
-                            }
                         }
 
                         if(iN == 4){
 
-                            etapaExitosa = true;
-
-                            System.out.println("Part 3.2");
                             if(!strippedString.contains("-sf")){
                                 System.out.println("Missing –sf");
                                 etapaExitosa = false;
@@ -170,18 +184,10 @@ public class Analyzer {
                                 System.out.println("Missing /usr/lib/" + linkerName);
                                 etapaExitosa = false;
                             }
-
-
-                            if(etapaExitosa){
-                                System.out.println("No mistakes were found.");
-                            }
                         }
 
                         if(iN == 5){
 
-                            etapaExitosa = true;
-
-                            System.out.println("Part 3.3");
                             if(!strippedString.contains("-sf")){
                                 System.out.println("Missing –sf");
                                 etapaExitosa = false;
@@ -201,6 +207,9 @@ public class Analyzer {
                             if(etapaExitosa){
                                 System.out.println("No mistakes were found.");
                             }
+
+                            System.out.println("\n");
+
                         }
 
 
@@ -227,6 +236,9 @@ public class Analyzer {
                             if(etapaExitosa){
                                 System.out.println("No mistakes were found.");
                             }
+
+                            System.out.println("\n");
+
                         }
                     }
                 }
@@ -241,6 +253,45 @@ public class Analyzer {
         } catch (IOException e) {
 
         }
+
+    }
+
+    public void getcFiles(String linea, LinkedList<String> list){
+        String[] result = linea.split("\\s");
+
+        for(int iA=0; iA<result.length;iA++){
+            if(result[iA].contains(".c")){
+                String[] result2 = result[iA].split("\\.");
+                list.add(result2[0]);
+            }
+        }
+    }
+
+
+    public boolean compareOtoC(String linea, LinkedList<String> list){
+
+        String[] result = linea.split("\\s");
+
+        LinkedList<String> list2 = new LinkedList<String>();
+
+        for(int iA=0; iA<result.length;iA++){
+            if(result[iA].contains(".o")){
+                String[] result2 = result[iA].split("\\.");
+                list2.add(result2[0]);
+                if(result2[0].equals('*'))
+
+                    //System.out.println("result2[0]" + result2[0]);
+                    return true;
+            }
+        }
+
+        // System.out.println(list.containsAll(list2));
+        //
+        // System.out.println(list);
+        //
+        // System.out.println(list2);
+
+        return list.containsAll(list2);
 
     }
 
@@ -279,5 +330,18 @@ public class Analyzer {
         return result[2];
     }
 
+    public boolean hasVersion(String word, int iN){
 
+        String[] result = word.split("\\.");
+
+        // for (int x=0; x<result.length; x++) {
+        //     System.out.println(result[x]);
+        // }
+
+        if(result.length > iN){
+
+            return true;
+        }
+        return false;
+    }
 }
