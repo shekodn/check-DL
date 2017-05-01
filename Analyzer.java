@@ -107,8 +107,6 @@ public class Analyzer {
                             soname = getSoName(strippedString);
                             realName = getRealName(strippedString);
                             linkerName = getLinkerName(strippedString);
-                            System.out.println(linkerName + "LOLA");
-
 
                             System.out.println("2. Merge files and build the library.");
                             if(!strippedString.contains("-shared")){
